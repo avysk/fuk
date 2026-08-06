@@ -90,7 +90,7 @@ swap line-coordinate 1-
 swap line-coordinate 1- ;
 
 \ draw a black square at the given coordinates.
-: draw-black-square ( xb yb -- )
+: draw-square ( xb yb -- )
   2dup
   square-bl-corner
   moveto
@@ -131,10 +131,10 @@ variable board-max
   draw-board-outline
   draw-horizontal-lines
   draw-vertical-lines
-  3 gcol
   9 1 do
-    5 1 do
-      i 2 * 1- j 2 mod + j draw-black-square
+    9 1 do
+      i j 2dup + 2 mod if 3 else 7 then gcol
+      draw-square
     loop
   loop
   15 gcol ;
