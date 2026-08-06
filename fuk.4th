@@ -67,56 +67,74 @@ create cats-y 1 , 1 , 1 , 1 ,
 
 \ the distance between origin and the bottom left corner of the boards,
 \ both horizontally and vertically.
-: border ( -- n ) 30 ;
+15 constant BORDER
 
 \ the size of one square on the board.
-: square-size ( -- n ) 120 ;
+55 constant SQUARE-SIZE
 
-\ the horizontal (or vertical) coordinate of the fartherst from the origin corner
-\ of the given square.
-: square-corner ( n -- m )
-  square-size * border + ;
+\ coordiane of horizontal or vertical line with given index (0-8)
+: line-coordinate ( index -- coord )
+SQUARE-SIZE 1+ ( + 1 for intermediate lines ) * 1+ ( for outline )
+BORDER + ;
 
-\ the horizontal (or vertical) coordinate of the top right corner of the board.
-: far-corner ( -- n )
-  8 square-corner ;
+\ coordinates of bottom left corner of the square with given coordinates,
+\ square coordinates start at one
+: square-bl-corner ( xb yb -- xs ys )
+swap 1- line-coordinate 1+
+swap 1- line-coordinate 1+ ;
+
+\ coordinates of top right corner of the square with given coordinates,
+\ square coordinates start at one
+: square-tr-corner ( xb yb -- xs ys )
+swap line-coordinate 1-
+swap line-coordinate 1- ;
 
 \ draw a black square at the given coordinates.
-: draw-black-square ( x y -- )
-  over over
+: draw-black-square ( xb yb -- )
+  2dup
+  square-bl-corner
   moveto
-  swap square-size +
-  swap square-size +
-  3 gcol
+  square-tr-corner
   box ;
 
 \ draw the outline of the board.
+variable board-min
+variable board-max
+0 line-coordinate board-min !
+8 line-coordinate board-max !
 : draw-board-outline ( -- )
-  0 mode
-  border border moveto
-  border far-corner line
-  far-corner far-corner line
-  far-corner border line
-  border border line ;
+  board-min @ dup over moveto
+  board-max @ ( min max ) 2dup line
+  dup dup line
+  over line
+  dup line ;
 
 \ draw horizontal lines of the board.
 : draw-horizontal-lines ( -- )
-  8 1 do
-    border i square-corner moveto
-    far-corner i square-corner line
+  9 1 do
+    i line-coordinate dup board-min @ swap moveto
+    board-max @ swap line
   loop ;
 
 \ draw vertical lines of the board.
 : draw-vertical-lines ( -- )
-  8 1 do
-    i square-corner border moveto
-    i square-corner far-corner line
+  9 1 do
+    i line-coordinate dup board-min @ moveto
+    board-max @ line
   loop ;
 
 \ draw the board.
 : draw-board ( -- )
-  8 0 do \ previous vertical coordinate
-    4 0 do \ previous horizontal coordinate
-      i 2 * j 2 mod + square-corner j square-corner draw-black-square
+  0 mode
+  23 EMIT 0 EMIT [ hex ] C0 [ decimal ] EMIT 0 EMIT \ switch off scaling
+  15 gcol
+  draw-board-outline
+  draw-horizontal-lines
+  draw-vertical-lines
+  3 gcol
+  9 1 do
+    5 1 do
+      i 2 * j 2 mod - j draw-black-square
     loop
-  loop ;
+  loop
+  15 gcol ;
