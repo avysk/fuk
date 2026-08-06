@@ -134,7 +134,7 @@ variable board-max
   3 gcol
   9 1 do
     5 1 do
-      i 2 * j 2 mod - j draw-black-square
+      i 2 * 1- j 2 mod + j draw-black-square
     loop
   loop
   15 gcol ;
