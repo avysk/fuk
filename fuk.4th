@@ -137,14 +137,8 @@ variable board-max
   SQUARE-SIZE 2 / 9 - +
   circle ;
 
-\ draw the board.
-: draw-board ( -- )
-  0 mode
-  23EMIT 0EMIT $C0 emit 0EMIT \ switch off scaling
-  15 gcol
-  draw-board-outline
-  draw-horizontal-lines
-  draw-vertical-lines
+\ draw squares and pieces, so after piece move the picture is correct
+: redraw-pieces
   9 1 do
     9 1 do
       i j 2dup + 2 mod if 3 else 7 then gcol
@@ -158,3 +152,13 @@ variable board-max
     i cat-x @ i cat-y @ draw-piece
   loop
   15 gcol ;
+
+\ draw the board.
+: draw-board ( -- )
+  0 mode
+  23EMIT 0EMIT $C0 emit 0EMIT \ switch off scaling
+  15 gcol
+  draw-board-outline
+  draw-horizontal-lines
+  draw-vertical-lines
+  redraw-pieces ;
