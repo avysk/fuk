@@ -6,7 +6,7 @@ variable fox-x
 variable fox-y
 
 \ cats coordinates, 1-8
-create cats-x 1 , 3 , 5 , 7 ,
+create cats-x 2 , 4 , 6 , 8 ,
 create cats-y 1 , 1 , 1 , 1 ,
 
 \ put on stack cell address of X coordinate of the cat with the given index, 1-4
@@ -14,21 +14,15 @@ create cats-y 1 , 1 , 1 , 1 ,
 \ put on stack cell address of Y coordinate of the cat with the given index, 1-4
 : cat-y ( n1 -- n2 ) 1- cells cats-y + ;
 
-: init-cats
-  5 1 do
-    i 2 * 1- i cat-x !
-    1 i cat-y !
-  loop ;
-
 \ check if fox is absent on given square
 : fox-absent? ( x y -- n )
   fox-y @ = swap
   fox-x @ = and
   0= ;
 
-: init-fox 4 fox-x ! 8 fox-y ! ;
+: init-fox 5 fox-x ! 8 fox-y ! ;
 
-: init-model init-cats init-fox ;
+: init-model init-fox ;
 
 \ check if on the given square there is no cat with given index (1-4)
 : cat-absent? ( x y n1 -- n2 )
@@ -77,24 +71,30 @@ create cats-y 1 , 1 , 1 , 1 ,
 SQUARE-SIZE 1+ ( + 1 for intermediate lines ) * 1+ ( for outline )
 BORDER + ;
 
-\ coordinates of bottom left corner of the square with given coordinates,
+\ coordinates of top left corner of the square with given coordinates,
 \ square coordinates start at one
-: square-bl-corner ( xb yb -- xs ys )
+: square-tl-corner ( xb yb -- xs ys )
 swap 1- line-coordinate 1+
 swap 1- line-coordinate 1+ ;
 
-\ coordinates of top right corner of the square with given coordinates,
+\ coordinates of bottom right corner of the square with given coordinates,
 \ square coordinates start at one
-: square-tr-corner ( xb yb -- xs ys )
+: square-br-corner ( xb yb -- xs ys )
 swap line-coordinate 1-
 swap line-coordinate 1- ;
 
-\ draw a black square at the given coordinates.
+\ coordinates of a center of the square with given coordinates,
+\ square coordinates start at one
+: square-center ( xb yb - xc yc )
+  square-tl-corner SQUARE-SIZE 2 / dup rot ( xb h h yb )
+  + rot rot + swap ;
+
+\ draw a filled square at the given coordinates.
 : draw-square ( xb yb -- )
   2dup
-  square-bl-corner
+  square-tl-corner
   moveto
-  square-tr-corner
+  square-br-corner
   box ;
 
 \ draw the outline of the board.
@@ -123,10 +123,24 @@ variable board-max
     board-max @ line
   loop ;
 
+\ draw the piece, given coordinates of the square it is index
+: draw-piece ( xb yb -- )
+  square-center 2dup 2dup 2dup 2dup 2dup moveto
+  SQUARE-SIZE 2 / 5 - +
+  \ filled circle
+  25EMIT $9D emit emit-xy
+  0 gcol
+  moveto
+  SQUARE-SIZE 2 / 5 - +
+  circle
+  moveto
+  SQUARE-SIZE 2 / 9 - +
+  circle ;
+
 \ draw the board.
 : draw-board ( -- )
   0 mode
-  23 EMIT 0 EMIT [ hex ] C0 [ decimal ] EMIT 0 EMIT \ switch off scaling
+  23EMIT 0EMIT $C0 emit 0EMIT \ switch off scaling
   15 gcol
   draw-board-outline
   draw-horizontal-lines
@@ -136,5 +150,11 @@ variable board-max
       i j 2dup + 2 mod if 3 else 7 then gcol
       draw-square
     loop
+  loop
+  1 gcol
+  fox-x @ fox-y @ draw-piece
+  5 1 do
+    8 gcol
+    i cat-x @ i cat-y @ draw-piece
   loop
   15 gcol ;
