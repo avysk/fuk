@@ -55,7 +55,7 @@ variable selected-cat
   loop
   >r 2drop r> ;
 
-\ check if cat can move up-left
+\ check if cat can move down-left
 : cat-can-move-left? ( n1 -- n2 )
   dup cat-x @ swap cat-y @ ( x y )
   dup 8 = if 2drop 0 exit then
@@ -63,7 +63,7 @@ variable selected-cat
   swap 1- swap 1+
   free-square ;
 
-\ check if cat can move up-right
+\ check if cat can move down-right
 : cat-can-move-right? ( n1 -- n2 )
   dup cat-x @ swap cat-y @ ( x y )
   dup 8 = if 2drop 0 exit then
