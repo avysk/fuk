@@ -191,7 +191,7 @@ variable board-max
   begin
     key case
       KEY_Q of 15 15 gcol col exit endof
-      BL of selected-cat dup @ 4 mod 1+ swap ! @ redraw-pieces endof
+      BL of selected-cat dup @ 4 mod 1+ swap ! redraw-pieces endof
       LEFT of selected-cat @ cat-can-move-left?
         if
           0 move-cat
