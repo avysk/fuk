@@ -179,7 +179,7 @@ variable board-max
   draw-vertical-lines
   redraw-pieces ;
 
-\ move cat left or right, and dawn
+\ move cat left or right, and down
 : move-cat ( right-flag -- )
   >r
   selected-cat @ dup cat-y swap cat-x ( cat-y cat-x )
