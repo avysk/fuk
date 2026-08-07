@@ -28,7 +28,13 @@ variable selected-cat
 
 : init-fox 5 fox-x ! 8 fox-y ! ;
 
-: init-model 1 selected-cat ! init-fox ;
+: init-model
+  5 1 do
+    i 2 * i cat-x !
+    1 i cat-y !
+  loop
+  1 selected-cat !
+  init-fox ;
 
 \ check if on the given square there is no cat with given index (1-4)
 : cat-absent? ( x y n1 -- n2 )
