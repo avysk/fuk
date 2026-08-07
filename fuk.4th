@@ -1,5 +1,9 @@
 require agon.4th
 
+8 constant LEFT
+21 constant RIGHT
+113 constant KEY_Q
+
 \ MODEL
 \ fox coordinates, 1-8
 variable fox-x
@@ -14,6 +18,8 @@ create cats-y 1 , 1 , 1 , 1 ,
 \ put on stack cell address of Y coordinate of the cat with the given index, 1-4
 : cat-y ( n1 -- n2 ) 1- cells cats-y + ;
 
+variable selected-cat
+
 \ check if fox is absent on given square
 : fox-absent? ( x y -- n )
   fox-y @ = swap
@@ -22,7 +28,7 @@ create cats-y 1 , 1 , 1 , 1 ,
 
 : init-fox 5 fox-x ! 8 fox-y ! ;
 
-: init-model init-fox ;
+: init-model 1 selected-cat ! init-fox ;
 
 \ check if on the given square there is no cat with given index (1-4)
 : cat-absent? ( x y n1 -- n2 )
@@ -124,12 +130,15 @@ variable board-max
   loop ;
 
 \ draw the piece, given coordinates of the square it is index
-: draw-piece ( xb yb -- )
-  square-center 2dup 2dup 2dup 2dup 2dup moveto
+: draw-piece ( selected-flag xb yb -- )
+  square-center ( selected-flag xs ys )
+  2dup 2dup ( selected-flag xs ys xs ys xs ys )
+  moveto ( selected-flag xs ys xs ys )
   SQUARE-SIZE 2 / 5 - +
   \ filled circle
-  25EMIT $9D emit emit-xy
-  0 gcol
+  25EMIT $9D emit emit-xy ( selected-flag xs ys )
+  rot if 10 else 0 then gcol ( xs ys )
+  2dup 2dup 2dup ( xs ys xs ys xs ys xs ys )
   moveto
   SQUARE-SIZE 2 / 5 - +
   circle
@@ -138,7 +147,7 @@ variable board-max
   circle ;
 
 \ draw squares and pieces, so after piece move the picture is correct
-: redraw-pieces
+: redraw-pieces ( -- )
   9 1 do
     9 1 do
       i j 2dup + 2 mod if 3 else 7 then gcol
@@ -146,9 +155,10 @@ variable board-max
     loop
   loop
   1 gcol
-  fox-x @ fox-y @ draw-piece
+  0 fox-x @ fox-y @ draw-piece
   5 1 do
     8 gcol
+    selected-cat @ i =
     i cat-x @ i cat-y @ draw-piece
   loop
   15 gcol ;
@@ -162,3 +172,32 @@ variable board-max
   draw-horizontal-lines
   draw-vertical-lines
   redraw-pieces ;
+
+\ move cat left or right, and dawn
+: move-cat ( right-flag -- )
+  >r
+  selected-cat @ dup cat-y swap cat-x ( cat-y cat-x )
+  dup @ r> if 1+ else 1- then ( cat-y cat-x new-xc ) swap !
+  dup @ 1+ swap !
+  redraw-pieces ;
+
+: game-loop
+  begin
+    key case
+      KEY_Q of 15 15 gcol col exit endof
+      BL of selected-cat dup @ 4 mod 1+ swap ! @ redraw-pieces endof
+      LEFT of selected-cat @ cat-can-move-left?
+        if
+          0 move-cat
+        then endof
+      RIGHT of selected-cat @ cat-can-move-right?
+        if
+          1 move-cat
+        then endof
+    endcase
+  again ;
+
+: game
+  init-model
+  draw-board
+  game-loop ;
