@@ -44,7 +44,7 @@ variable selected-cat
   cat-x @ = and 0= ;
 
 \ check if the given place is free (no cats, no fox)
-: free-square ( x y -- n )
+: free-square? ( x y -- n )
   2dup fox-absent? ( x y flag )
   5 1 do
     rot rot ( flag x y )
@@ -61,7 +61,7 @@ variable selected-cat
   dup 8 = if 2drop 0 exit then
   over 1 = if 2drop 0 exit then
   swap 1- swap 1+
-  free-square ;
+  free-square? ;
 
 \ check if cat can move down-right
 : cat-can-move-right? ( n1 -- n2 )
@@ -69,7 +69,50 @@ variable selected-cat
   dup 8 = if 2drop 0 exit then
   over 8 = if 2drop 0 exit then
   swap 1+ swap 1+
-  free-square ;
+  free-square? ;
+
+\ check if fox can move into the given direction
+\ right-flag -- go right or left
+\ top-flag -- to top or bottom
+: fox-can-move? ( right-flag top-flag -- n )
+  dup
+  if 1 else 8 then fox-y @ =
+  if 2drop 0 exit then
+  if -1 else 1 then fox-y @ + swap
+  dup
+  if 8 else 1 then fox-x @ =
+  if 0 exit then
+  if 1 else -1 then fox-x @ + swap
+  free-square? ;
+
+: fox-can-move-up-right?
+  -1 -1 fox-can-move? ;
+: fox-can-move-up-left?
+  0 -1 fox-can-move? ;
+: fox-can-move-down-right?
+  -1 0 fox-can-move? ;
+: fox-can-move-down-left?
+  0 0 fox-can-move? ;
+
+\ possible fox moves
+: possible-fox-moves ( -- dx dy ... number-of-moves )
+  0
+  fox-can-move-up-right?
+  if
+    1 -1 rot 1+
+  then
+  fox-can-move-down-right?
+  if
+    1 1 rot 1+
+  then
+  fox-can-move-down-left?
+  if
+    -1 1 rot 1+
+  then
+  fox-can-move-up-left?
+  if
+    -1 -1 rot 1+
+  then ;
 
 \ the distance between origin and the bottom left corner of the boards,
 \ both horizontally and vertically.
@@ -187,10 +230,18 @@ variable board-max
   dup @ 1+ swap !
   redraw-pieces ;
 
+\ clear status message
+: clear-status
+  0 gcol 480 40 moveto 630 50 box ;
+
+\ switch to display at status area
+: prepare-for-status
+  5 emit 480 40 moveto ;
+
 : game-loop
   begin
     key case
-      KEY_Q of 15 15 gcol col exit endof
+      KEY_Q of 15 15 gcol col 0 mode 15 col 15 gcol exit endof
       BL of selected-cat dup @ 4 mod 1+ swap ! redraw-pieces endof
       LEFT of selected-cat @ cat-can-move-left?
         if
@@ -201,6 +252,12 @@ variable board-max
           1 move-cat
         then endof
     endcase
+    clear-status
+    possible-fox-moves 0=
+    if
+      prepare-for-status
+      10 gcol ." Cats won!"
+    then
   again ;
 
 : game
