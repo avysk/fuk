@@ -124,6 +124,23 @@ variable board-max
 
 : game-loop
   begin
+    redraw-pieces
+    possible-fox-moves dup 0=
+    if
+      prepare-for-status
+      10 gcol ." Cats won!"
+      drop
+      key drop
+      0 mode 15 gcol 15 col exit
+    then
+    0 do 2drop loop
+    selected-cat @ -1 =
+    if
+      prepare-for-status
+      10 gcol ." Fox won!"
+      key drop
+      0 mode 15 gcol 15 col exit
+    then
     key case
       KEY_Q of 0 mode 15 col 15 gcol exit endof
       BL of selected-cat dup @ 4 mod 1+ swap ! adjust-selection endof
@@ -137,11 +154,6 @@ variable board-max
         then endof
     endcase
     clear-status
-    possible-fox-moves 0=
-    if
-      prepare-for-status
-      10 gcol ." Cats won!"
-    then
   again ;
 
 : game
