@@ -125,8 +125,8 @@ variable board-max
 : game-loop
   begin
     key case
-      KEY_Q of 15 15 gcol col 0 mode 15 col 15 gcol exit endof
-      BL of selected-cat dup @ 4 mod 1+ swap ! redraw-pieces endof
+      KEY_Q of 0 mode 15 col 15 gcol exit endof
+      BL of selected-cat dup @ 4 mod 1+ swap ! adjust-selection endof
       LEFT of selected-cat @ cat-can-move-left?
         if
           0 move-cat
