@@ -88,6 +88,7 @@ variable board-max
 
 \ draw squares and pieces, so after piece move the picture is correct
 : redraw-pieces ( -- )
+  vwait
   9 1 do
     9 1 do
       i j 2dup + 2 mod if 3 else 7 then gcol
