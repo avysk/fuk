@@ -106,11 +106,33 @@ variable board-max
   loop
   15 gcol ;
 
-\ draw the board.
-: draw-board ( -- )
+\ start screen, puts on the stack number of chosen fox strategy
+: start-screen ( -- n )
   0 mode
   23EMIT 0EMIT $C0 emit 0EMIT \ switch off scaling
   vwait
+  15 col
+  ." --------------------" cr
+  ." | Fuchs und katsen |" cr
+  ." --------------------" cr cr
+  ." Choose fox strategy:" cr
+  ." 1. Random" cr
+  ." 2. Random with top preference" cr
+  ." q/Q. Quit game" cr
+  begin
+    key [char] 0 - dup
+    case
+      1 of exit endof
+      2 of exit endof
+      33 ( Q ) of drop 0 exit endof
+      65 ( q ) of drop 0 exit endof
+    endcase
+    drop
+  again ;
+
+\ draw the board.
+: draw-board ( -- )
+  0 mode
   15 gcol
   draw-board-outline
   draw-horizontal-lines
@@ -145,8 +167,8 @@ variable board-max
     redraw-pieces
     clear-status
     ( fox move is supposed to put true value on stack if it some move was done )
-    random-fox
-    0 =
+    fox-move
+    0=
     if
       prepare-for-status
       10 gcol ." Cats won!"
@@ -168,7 +190,13 @@ variable board-max
   again ;
 
 : game
-  init-model
-  draw-board
-  redraw-pieces
-  game-loop ;
+  begin
+    init-model
+    start-screen
+    dup
+    0= if drop exit then
+    fox-strategy !
+    draw-board
+    redraw-pieces
+    game-loop
+  again ;

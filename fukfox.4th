@@ -1,6 +1,8 @@
 require fukmodel.4th
 require fukrand.4th
 
+variable fox-strategy
+
 \ check if fox can move into the given direction
 \ right-flag -- go right or left
 \ top-flag -- to top or bottom
@@ -51,9 +53,8 @@ require fukrand.4th
     -1 -1 (store-fox-move!)
   then ;
 
-\ choose random fox move, on stack there's a number of possible moves
-: random-fox ( n -- )
-  possible-fox-moves dup 0=
+: random-fox ( -- )
+  dup 0=
   if exit then
   case
     1 of 0 endof
@@ -63,3 +64,27 @@ require fukrand.4th
   endcase
   dup fox-dx @ fox-x @ + fox-x !
   fox-dy @ fox-y @ + fox-y ! -1 ;
+
+: random-fox-top
+  0
+  fox-can-move-up-left?
+  if -1 -1 (store-fox-move!) then
+  fox-can-move-up-right?
+  if 1 -1 (store-fox-move!) then
+  dup 0= if
+    \ there were no moves up
+    fox-can-move-down-left?
+    if -1 1 (store-fox-move!) then
+    fox-can-move-down-right?
+    if 1 1 (store-fox-move!) then
+  then
+  random-fox ;
+
+
+: fox-move
+  fox-strategy @
+  case
+    1 of possible-fox-moves random-fox exit endof
+    2 of random-fox-top exit endof
+  endcase
+  0 ;
