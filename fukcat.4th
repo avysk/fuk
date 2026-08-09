@@ -46,5 +46,4 @@ require fukmodel.4th
   drop -1 \ we are going to leave on stack "proceed to fox move" true value
   selected-cat @ dup cat-y swap cat-x ( cat-y cat-x )
   dup @ r> if 1+ else 1- then ( cat-y cat-x new-xc ) swap !
-  dup @ 1+ swap !
-  adjust-selection ;
+  dup @ 1+ swap ! ;
