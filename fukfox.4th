@@ -53,6 +53,8 @@ require fukrand.4th
 
 \ choose random fox move, on stack there's a number of possible moves
 : random-fox ( n -- )
+  possible-fox-moves dup 0=
+  if exit then
   case
     1 of 0 endof
     2 of rand2 endof
@@ -60,4 +62,4 @@ require fukrand.4th
     4 of rand4 endof
   endcase
   dup fox-dx @ fox-x @ + fox-x !
-  fox-dy @ fox-y @ + fox-y ! ;
+  fox-dy @ fox-y @ + fox-y ! -1 ;

@@ -144,7 +144,9 @@ variable board-max
     until
     redraw-pieces
     clear-status
-    possible-fox-moves dup 0=
+    ( fox move is supposed to put true value on stack if it some move was done )
+    random-fox
+    0 =
     if
       prepare-for-status
       10 gcol ." Cats won!"
@@ -152,7 +154,6 @@ variable board-max
       key drop
       0 mode 15 gcol 15 col exit
     then
-    random-fox
     adjust-selection
     redraw-pieces
     selected-cat @ -1 =
