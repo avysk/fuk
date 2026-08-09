@@ -126,8 +126,8 @@ variable board-max
 
 : game-loop
   begin
-    0 \ 0 for "do not terminate the loop"; "move-cat" will replace it with -1
     begin
+    0 \ 0 for "do not terminate the loop"; "move-cat" will replace it with -1
       key case
         KEY_Q of drop 0 mode 15 col 15 gcol exit endof
         BL of
