@@ -1,6 +1,7 @@
 require agon.4th
 require fukfox.4th
 require fukmodel.4th
+require fukcat.4th
 
 8 constant LEFT
 21 constant RIGHT
