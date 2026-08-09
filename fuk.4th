@@ -1,4 +1,5 @@
 require agon.4th
+require fukfox.4th
 require fukmodel.4th
 
 8 constant LEFT
@@ -124,7 +125,24 @@ variable board-max
 
 : game-loop
   begin
+    0 \ 0 for "do not terminate the loop"; "move-cat" will replace it with -1
+    begin
+      key case
+        KEY_Q of drop 0 mode 15 col 15 gcol exit endof
+        BL of
+          selected-cat dup @ 4 mod 1+ swap ! adjust-selection
+          redraw-pieces
+        endof
+        LEFT of selected-cat @ cat-can-move-left?
+          if 0 move-cat then
+        endof
+        RIGHT of selected-cat @ cat-can-move-right?
+          if 1 move-cat then
+        endof
+      endcase
+    until
     redraw-pieces
+    clear-status
     possible-fox-moves dup 0=
     if
       prepare-for-status
@@ -133,30 +151,22 @@ variable board-max
       key drop
       0 mode 15 gcol 15 col exit
     then
-    0 do 2drop loop
+    random-fox
+    adjust-selection
+    redraw-pieces
     selected-cat @ -1 =
+    fox-y @ 1 =
+    or
     if
       prepare-for-status
-      10 gcol ." Fox won!"
+      9 gcol ." Fox won!"
       key drop
       0 mode 15 gcol 15 col exit
     then
-    key case
-      KEY_Q of 0 mode 15 col 15 gcol exit endof
-      BL of selected-cat dup @ 4 mod 1+ swap ! adjust-selection endof
-      LEFT of selected-cat @ cat-can-move-left?
-        if
-          0 move-cat
-        then endof
-      RIGHT of selected-cat @ cat-can-move-right?
-        if
-          1 move-cat
-        then endof
-    endcase
-    clear-status
   again ;
 
 : game
   init-model
   draw-board
+  redraw-pieces
   game-loop ;
