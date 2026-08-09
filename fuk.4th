@@ -172,7 +172,6 @@ variable board-max
     if
       prepare-for-status
       10 gcol ." Cats won!"
-      drop
       key drop
       0 mode 15 gcol 15 col exit
     then
