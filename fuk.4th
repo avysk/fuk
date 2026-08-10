@@ -118,12 +118,14 @@ variable board-max
   ." Choose fox strategy:" cr
   ." 1. Random" cr
   ." 2. Random with top preference" cr
+  ." 3. Heuristic" cr
   ." q/Q. Quit game" cr
   begin
     key [char] 0 - dup
     case
       1 of exit endof
       2 of exit endof
+      3 of exit endof
       33 ( Q ) of drop 0 exit endof
       65 ( q ) of drop 0 exit endof
     endcase
