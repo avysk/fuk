@@ -150,25 +150,6 @@ variable board-max
 
 : game-loop
   begin
-    begin
-    0 \ 0 for "do not terminate the loop"; "move-cat" will replace it with -1
-      key case
-        KEY_Q of drop 0 mode 15 col 15 gcol exit endof
-        BL of
-          selected-cat dup @ 4 mod 1+ swap ! adjust-selection
-          redraw-pieces
-        endof
-        LEFT of selected-cat @ cat-can-move-left?
-          if 0 move-cat then
-        endof
-        RIGHT of selected-cat @ cat-can-move-right?
-          if 1 move-cat then
-        endof
-      endcase
-    until
-    redraw-pieces
-    clear-status
-    ( fox move is supposed to put true value on stack if it some move was done )
     fox-move
     0=
     if
@@ -188,6 +169,25 @@ variable board-max
       key drop
       0 mode 15 gcol 15 col exit
     then
+    begin
+    0 \ 0 for "do not terminate the loop"; "move-cat" will replace it with -1
+      key case
+        KEY_Q of drop 0 mode 15 col 15 gcol exit endof
+        BL of
+          selected-cat dup @ 4 mod 1+ swap ! adjust-selection
+          redraw-pieces
+        endof
+        LEFT of selected-cat @ cat-can-move-left?
+          if 0 move-cat then
+        endof
+        RIGHT of selected-cat @ cat-can-move-right?
+          if 1 move-cat then
+        endof
+      endcase
+    until
+    redraw-pieces
+    clear-status
+    ( fox move is supposed to put true value on stack if it some move was done )
   again ;
 
 : game
