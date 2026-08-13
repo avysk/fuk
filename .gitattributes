@@ -1,0 +1,2 @@
+vdus/menu-640x480.vdu filter=lfs diff=lfs merge=lfs -text
+vdus/fuchs-und-katzen-640x480.vdu filter=lfs diff=lfs merge=lfs -text

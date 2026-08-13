@@ -2,6 +2,7 @@ require agon.4th
 require fukfox.4th
 require fukmodel.4th
 require fukcat.4th
+require fukvdu.4th
 
 8 constant LEFT
 21 constant RIGHT
@@ -14,7 +15,7 @@ require fukcat.4th
 \ the size of one square on the board.
 55 constant SQUARE-SIZE
 
-\ coordiane of horizontal or vertical line with given index (0-8)
+\ coordinate of horizontal or vertical line with given index (0-8)
 : line-coordinate ( index -- coord )
 SQUARE-SIZE 1+ ( + 1 for intermediate lines ) * 1+ ( for outline )
 BORDER + ;
@@ -106,28 +107,43 @@ variable board-max
   loop
   15 gcol ;
 
-\ start screen, puts on the stack number of chosen fox strategy
-: start-screen ( -- n )
+: splash
   0 mode
+  0 cursor
+  clg
   23EMIT 0EMIT $C0 emit 0EMIT \ switch off scaling
   vwait
+  s" fuchs-und-katzen-640x480.vdu" lvdu
   15 col
-  ." --------------------" cr
-  ." | Fuchs und katsen |" cr
-  ." --------------------" cr cr
-  ." Choose fox strategy:" cr
-  ." 1. Random" cr
-  ." 2. Random with top preference" cr
-  ." 3. Heuristic" cr
-  ." q/Q. Quit game" cr
+  3 55 at-xy
+  ." v1.0.0" ;
+
+: (timer16) ( -- u )
+  1 sysvars@ 8 lshift
+  0 sysvars@ or ;
+
+300 constant splash-timeout ( centiseconds )
+: splash-wait
+  (timer16)
+  begin
+    key?
+    if drop exit then
+  dup (timer16) splash-timeout - <=
+  until
+  drop ;
+
+\ start screen, puts on the stack number of chosen fox strategy
+: menu ( -- n )
+  clg
+  s" menu-640x480.vdu" lvdu
   begin
     key [char] 0 - dup
     case
       1 of exit endof
       2 of exit endof
       3 of exit endof
-      33 ( Q ) of drop 0 exit endof
-      65 ( q ) of drop 0 exit endof
+      33 ( Q ) of drop 1 cursor 0 exit endof
+      65 ( q ) of drop 1 cursor 0 exit endof
     endcase
     drop
   again ;
@@ -191,11 +207,15 @@ variable board-max
   again ;
 
 : game
+  splash
+  splash-wait
+  clg
   begin
     init-model
-    start-screen
+    menu
+    clg
     dup
-    0= if drop exit then
+    0= if drop 0 0 at-xy ." Goodbye!" cr bye then
     fox-strategy !
     draw-board
     redraw-pieces
