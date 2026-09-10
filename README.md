@@ -6,6 +6,8 @@ retro computer.
 The Forth implementation the game is developed for is
 [agon-forth](https://github.com/lennart-benschop/agon-forth/tree/main).
 
+![Screenshot of start menu in emulator](screenshot.png)
+
 # Preparation
 
 Copy `fuk.4th` and files from `vdus/` to the root directory of your SD card.
