@@ -1,7 +1,9 @@
 # Fuchs und Katzen
 
-Implementation of a "Fox and Hounds" game in Forth for Agon Light
-retro computer.
+Implementation of a
+[Fox and Hounds](https://boardgamegeek.com/boardgame/148180/fox-and-hounds)
+game in Forth for
+[Agon Light](https://www.thebyteattic.com/p/agon.html) retro computer.
 
 The Forth implementation the game is developed for is
 [agon-forth](https://github.com/lennart-benschop/agon-forth/tree/main).
