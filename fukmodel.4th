@@ -52,4 +52,4 @@ variable selected-cat
     >r rot r> ( x y flag cat-flag )
     and ( x y new-flag )
   loop
-  >r 2drop r> ;
+  nip nip ;
