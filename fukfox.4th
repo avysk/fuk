@@ -118,7 +118,7 @@ variable potential-fox-y
     2dup r> cat-absent?
     r> and
   loop
-  rot rot 2drop ;
+  nip nip ;
 
 6 constant MOBILITY-WEIGHT
 4 constant PROGRESS-WEIGHT
