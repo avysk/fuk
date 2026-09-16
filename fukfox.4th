@@ -117,16 +117,19 @@ variable potential-fox-y
   loop
   2drop true ;
 
+10000 constant (WINNING-MOVE-HEURISTIC)
 6 constant MOBILITY-WEIGHT
 4 constant PROGRESS-WEIGHT
 8 constant CATS-WEIGHT
 3 constant EDGE-PENALTY-WEIGHT
+-10000 constant (CATS-WIN-IN-ONE-PENALTY)
+1000 constant (BYPASSED-ALL-CATS-BONUS)
 \ Calculate heuristic for fox at potential-fox-x and potential-fox-y
 : fox-heuristic-f ( -- n )
   potential-fox-x @ fox-from-x !
   potential-fox-y @ dup
   1 = if \ winning move
-    drop $7FFF exit
+    drop (WINNING-MOVE-HEURISTIC) exit
   then
   fox-from-y !
   (count-mobility) dup
@@ -137,15 +140,16 @@ variable potential-fox-y
     \ since cat-absent? will return true
     fox-x @ fox-y @
     1- swap 1- swap
-    2dup (cats-absent?) 0= if drop -10000 exit then
+    2dup (cats-absent?) 0= if 2drop drop (CATS-WIN-IN-ONE-PENALTY) exit then
     swap 2 + swap
-    (cats-absent?) 0= if drop -10000 exit then
+    (cats-absent?) 0= if drop (CATS-WIN-IN-ONE-PENALTY) exit then
   then \ check for cats win-in-one
   MOBILITY-WEIGHT *
   8 potential-fox-y @ - PROGRESS-WEIGHT * +
   (bypassed-cats) dup
-  \ if moves bypasses all cats, do it
-  4 = if drop drop 10000 exit then
+  \ if moves bypasses all cats, it is really good, and we are giving it a
+  \ huge bonus
+  4 = if drop (BYPASSED-ALL-CATS-BONUS) then
   CATS-WEIGHT * +
   potential-fox-x @ dup 1 = swap 8 = or
   if
@@ -160,7 +164,6 @@ variable (heuristic-max)
 \ move fox to the square with largest heuristic function (if there are several,
 \ choose randomly).
 : heuristic-fox
-  \ the current biggest value of heuristic is stored at return stack
   -$7FFF (heuristic-max) !
   \ we are going to keep on stack number-of-moves and in fox-moves array
   \ the moves themselves
