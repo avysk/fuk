@@ -1,7 +1,7 @@
 require fukmodel.4th
 
 \ check if cat can move down-left
-: cat-can-move-left? ( n1 -- n2 )
+: cat-can-move-left? ( cat# -- flag )
   dup cat-x @ swap cat-y @ ( x y )
   dup 8 = if 2drop 0 exit then
   over 1 = if 2drop 0 exit then
@@ -9,7 +9,7 @@ require fukmodel.4th
   free-square? ;
 
 \ check if cat can move down-right
-: cat-can-move-right? ( n1 -- n2 )
+: cat-can-move-right? ( cat# -- flag )
   dup cat-x @ swap cat-y @ ( x y )
   dup 8 = if 2drop 0 exit then
   over 8 = if 2drop 0 exit then
@@ -17,20 +17,20 @@ require fukmodel.4th
   free-square? ;
 
 \ check if cat can move at all
-: cat-can-move? ( n -- b )
+: (cat-can-move?) ( cat# -- flag )
   dup cat-can-move-left?
   swap cat-can-move-right?
   or ;
 
-: (next-cat) ( n1 -- n2 )
+: (next-cat) ( cat# -- cat# )
   1+ dup 5 =
   if drop 1 then ;
 
 \ move selection to the first cat that can move
-: adjust-selection
+: adjust-selection ( -- )
   selected-cat @
   4 0 do
-    dup cat-can-move?
+    dup (cat-can-move?)
     if
       selected-cat !
       unloop exit
