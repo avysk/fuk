@@ -35,9 +35,10 @@ FLOAD fuk.4th
 ' GAME TURNKEY fuk.bin
 ```
 
-Now you can exit Forth (with `BYE`) and remove all `*.4th` and vdu files you
+Now you can exit Forth (with `BYE`) and remove all `*.4th` files you
 copied to your SD card. Now you have a self-contained `fuk.bin` which can be
-moved to anywhere and run.
+moved to anywhere and run. Notice: `*.vdu` files are still required, and should
+present in the same directory as `fuk.bin`.
 
 # Playing the Game
 
