@@ -111,14 +111,11 @@ variable potential-fox-y
   loop ;
 
 : (cats-absent?) ( x y -- flag )
-  -1
   5 1 do
-    i swap >r \ store old flag
-    >r \ store i
-    2dup r> cat-absent?
-    r> and
+    2dup i cat-absent? 0=
+    if 2drop false unloop exit then
   loop
-  nip nip ;
+  2drop true ;
 
 6 constant MOBILITY-WEIGHT
 4 constant PROGRESS-WEIGHT
