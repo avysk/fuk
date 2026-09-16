@@ -1,11 +1,11 @@
 require files.4th
 require agon.4th
 
-create vdu-buf 512 allot
+create (vdu-buf) 512 allot
 
-variable Vdu-fid
+variable (vdu-fid)
 
-: emit-buffer ( addr len -- )
+: (emit-buffer) ( addr len -- )
   bounds do
     i c@ emit
   loop ;
@@ -13,14 +13,14 @@ variable Vdu-fid
 : lvdu ( addr len -- )
   r/o open-file
   -38 ?throw
-  vdu-fid !
+  (vdu-fid) !
   begin
-    vdu-buf 512 vdu-fid @
+    (vdu-buf) 512 (vdu-fid) @
     read-file
     throw
     dup
   while
-    vdu-buf swap emit-buffer
+    (vdu-buf) swap (emit-buffer)
   repeat
   drop
-  vdu-fid @ close-file throw ;
+  (vdu-fid) @ close-file throw ;
