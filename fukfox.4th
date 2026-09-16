@@ -3,66 +3,64 @@ require fukrand.4th
 
 variable fox-strategy
 
-variable fox-from-x
-variable fox-from-y
+variable (fox-from-x)
+variable (fox-from-y)
 \ check if fox can move into the given direction
-\ the source square is in (fox-from-x, fox-from-y)
+\ the source square is in ((fox-from-x), (fox-from-y))
 \ right-flag -- go right or left
 \ top-flag -- to top or bottom
-: fox-can-move? ( right-flag top-flag -- n )
+: (fox-can-move?) ( right-flag top-flag -- flag )
   dup
-  if 1 else 8 then fox-from-y @ =
+  if 1 else 8 then (fox-from-y) @ =
   if 2drop 0 exit then
-  if -1 else 1 then fox-from-y @ + swap
+  if -1 else 1 then (fox-from-y) @ + swap
   dup
-  if 8 else 1 then fox-from-x @ =
+  if 8 else 1 then (fox-from-x) @ =
   if 2drop 0 exit then
-  if 1 else -1 then fox-from-x @ + swap
+  if 1 else -1 then (fox-from-x) @ + swap
   free-square? ;
 
-: fox-can-move-up-right?
-  -1 -1 fox-can-move? ;
-: fox-can-move-up-left?
-  0 -1 fox-can-move? ;
-: fox-can-move-down-right?
-  -1 0 fox-can-move? ;
-: fox-can-move-down-left?
-  0 0 fox-can-move? ;
+: (fox-can-move-up-right?) ( -- flag )
+  -1 -1 (fox-can-move?) ;
+: (fox-can-move-up-left?) ( -- flag )
+  0 -1 (fox-can-move?) ;
+: (fox-can-move-down-right?) ( -- flag )
+  -1 0 (fox-can-move?) ;
+: (fox-can-move-down-left?) ( -- flag )
+  0 0 (fox-can-move?) ;
 
-: (store-fox-move!) ( index dx dy -- index + 1 )
-  >r over ( index dx index )
-  fox-dx ! ( index )
-  r> over ( index dy index )
-  fox-dy !
+: (store-fox-move!) ( move# dx dy -- move#' )
+  >r over fox-dx !
+  r> over fox-dy !
   1+ ;
 
 \ possible fox moves, moves are stored in fox-moves array
-\ the source square is (fox-from-x, fox-from-y)
-: possible-fox-moves ( -- number-of-moves )
+\ the source square is ((fox-from-x), (fox-from-y))
+: (possible-fox-moves) ( -- #moves )
   0
-  fox-can-move-up-right?
+  (fox-can-move-up-right?)
   if
     1 -1 (store-fox-move!)
   then
-  fox-can-move-down-right?
+  (fox-can-move-down-right?)
   if
     1 1 (store-fox-move!)
   then
-  fox-can-move-down-left?
+  (fox-can-move-down-left?)
   if
     -1 1 (store-fox-move!)
   then
-  fox-can-move-up-left?
+  (fox-can-move-up-left?)
   if
     -1 -1 (store-fox-move!)
   then ;
 
 \ perform move with given index
-: apply-fox-move ( n -- )
+: (apply-fox-move) ( move# -- )
   dup fox-dx @ fox-x @ + fox-x !
   fox-dy @ fox-y @ + fox-y ! ;
 
-: random-fox ( -- )
+: (random-fox) ( #moves -- flag )
   dup 0=
   if exit then
   case
@@ -71,42 +69,42 @@ variable fox-from-y
     3 of rand3 endof
     4 of rand4 endof
   endcase
-  apply-fox-move -1 ;
+  (apply-fox-move) true ;
 
-: random-fox-top
+: (random-fox-top) ( -- flag )
   0
-  fox-can-move-up-left?
+  (fox-can-move-up-left?)
   if -1 -1 (store-fox-move!) then
-  fox-can-move-up-right?
+  (fox-can-move-up-right?)
   if 1 -1 (store-fox-move!) then
   dup 0= if
     \ there were no moves up
-    fox-can-move-down-left?
+    (fox-can-move-down-left?)
     if -1 1 (store-fox-move!) then
-    fox-can-move-down-right?
+    (fox-can-move-down-right?)
     if 1 1 (store-fox-move!) then
   then
-  random-fox ;
+  (random-fox) ;
 
-variable potential-fox-x
-variable potential-fox-y
+variable (potential-fox-x)
+variable (potential-fox-y)
 
-: (count-mobility)
+: (count-mobility) ( -- #moves )
   0
-  fox-can-move-up-right?
+  (fox-can-move-up-right?)
   if 1+ then
-  fox-can-move-down-right?
+  (fox-can-move-down-right?)
   if 1+ then
-  fox-can-move-down-left?
+  (fox-can-move-down-left?)
   if 1+ then
-  fox-can-move-up-left?
+  (fox-can-move-up-left?)
   if 1+ then
   1+ ; \ can always go back
 
-: (bypassed-cats)
+: (bypassed-cats) ( -- #cats )
   0
   5 1 do
-    i cat-y @ potential-fox-y @ >=
+    i cat-y @ (potential-fox-y) @ >=
     if 1+ then
   loop ;
 
@@ -124,14 +122,14 @@ variable potential-fox-y
 3 constant EDGE-PENALTY-WEIGHT
 -10000 constant (CATS-WIN-IN-ONE-PENALTY)
 1000 constant (BYPASSED-ALL-CATS-BONUS)
-\ Calculate heuristic for fox at potential-fox-x and potential-fox-y
+\ Calculate heuristic for fox at (potential-fox-x) and (potential-fox-y)
 : fox-heuristic-f ( -- n )
-  potential-fox-x @ fox-from-x !
-  potential-fox-y @ dup
+  (potential-fox-x) @ (fox-from-x) !
+  (potential-fox-y) @ dup
   1 = if \ winning move
     drop (WINNING-MOVE-HEURISTIC) exit
   then
-  fox-from-y !
+  (fox-from-y) !
   (count-mobility) dup
   \ now heavily penalize if cats can win in one move
   1 = if
@@ -145,34 +143,34 @@ variable potential-fox-y
     (cats-absent?) 0= if drop (CATS-WIN-IN-ONE-PENALTY) exit then
   then \ check for cats win-in-one
   MOBILITY-WEIGHT *
-  8 potential-fox-y @ - PROGRESS-WEIGHT * +
+  8 (potential-fox-y) @ - PROGRESS-WEIGHT * +
   (bypassed-cats) dup
   \ if moves bypasses all cats, it is really good, and we are giving it a
   \ huge bonus
   4 = if drop (BYPASSED-ALL-CATS-BONUS) then
   CATS-WEIGHT * +
-  potential-fox-x @ dup 1 = swap 8 = or
+  (potential-fox-x) @ dup 1 = swap 8 = or
   if
     EDGE-PENALTY-WEIGHT -
   then ;
 
-: (store-potential-move) ( move-index -- )
-  dup fox-dx @ fox-x @ + potential-fox-x !
-  fox-dy @ fox-y @ + potential-fox-y ! ;
+: (store-potential-move) ( #move -- )
+  dup fox-dx @ fox-x @ + (potential-fox-x) !
+  fox-dy @ fox-y @ + (potential-fox-y) ! ;
 
 variable (heuristic-max)
 \ move fox to the square with largest heuristic function (if there are several,
 \ choose randomly).
-: heuristic-fox
+: (heuristic-fox) ( -- flag )
   -$7FFF (heuristic-max) !
   \ we are going to keep on stack number-of-moves and in fox-moves array
   \ the moves themselves
   0 ( number of moves found )
-  possible-fox-moves
+  (possible-fox-moves)
   dup 1 =
   if
     drop
-    apply-fox-move -1 exit
+    (apply-fox-move) true exit
   then
     0 ?do \ iterate all possible moves
       i (store-potential-move)
@@ -193,22 +191,22 @@ variable (heuristic-max)
         then \ another move with the same heuristic
       then \ check heurstic for the considered move
     loop \ all possible moves iteration
-  random-fox ;
+  (random-fox) ;
 
 
 : fox-move
   fox-strategy @
-  fox-x @ fox-from-x !
-  fox-y @ fox-from-y !
+  fox-x @ (fox-from-x) !
+  fox-y @ (fox-from-y) !
   case
     1 of
-      possible-fox-moves random-fox exit
+      (possible-fox-moves) (random-fox) exit
     endof
     2 of
-      random-fox-top exit
+      (random-fox-top) exit
     endof
     3 of
-      heuristic-fox exit
+      (heuristic-fox) exit
     endof
   endcase
   0 ;

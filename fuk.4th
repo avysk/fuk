@@ -116,7 +116,7 @@ variable board-max
   s" fuchs-und-katzen-640x480.vdu" lvdu
   15 col
   3 55 at-xy
-  ." v1.0.1" ;
+  ." v1.0.2" ;
 
 : (timer16) ( -- u )
   1 sysvars@ 8 lshift
