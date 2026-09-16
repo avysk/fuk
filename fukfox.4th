@@ -137,10 +137,9 @@ variable potential-fox-y
     \ since cat-absent? will return true
     fox-x @ fox-y @
     1- swap 1- swap
-    2dup (cats-absent?) >r
+    2dup (cats-absent?) 0= if drop -10000 exit then
     swap 2 + swap
-    (cats-absent?) r> and
-    0= if drop -10000 exit then
+    (cats-absent?) 0= if drop -10000 exit then
   then \ check for cats win-in-one
   MOBILITY-WEIGHT *
   8 potential-fox-y @ - PROGRESS-WEIGHT * +
